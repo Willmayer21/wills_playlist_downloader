@@ -40,10 +40,23 @@ function updateTrackProgress(data) {
 function showDownloadComplete(data) {
   document.getElementById('download-complete').innerHTML = `
     <div style="margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 4px;">
-      <p>Download complete! Files are saved in the downloads directory.</p>
-      <p>You can access your files here: <a href="${data.download_path}" style="color: #1DB954;">Download Files</a></p>
+      <p>Playlist preparation complete!</p>
+      <a href="${data.download_path}" class="download-btn" style="display: inline-block; background: #10B981; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; margin-top: 10px;">Download Zip File</a>
     </div>
   `;
+
+  const downloadBtn = document.getElementById('download-zip-btn');
+  downloadBtn.style.display = 'inline-block';
+  downloadBtn.href = data.download_path;
+
+  const allDownloadBtns = document.querySelectorAll('.download-btn, #download-zip-btn');
+  allDownloadBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    });
+  });
 }
 
 function showError(data) {

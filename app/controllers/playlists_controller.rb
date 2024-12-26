@@ -1,4 +1,3 @@
-# app/controllers/playlists_controller.rb
 class PlaylistsController < ApplicationController
   require 'csv'
   require 'rspotify'
@@ -19,7 +18,8 @@ class PlaylistsController < ApplicationController
       @playlist = RSpotify::Playlist.find_by_id(@playlist_id)
       raise "Playlist not found" unless @playlist
 
-      download_dir = Rails.root.join('public', 'downloads', "spotify_downloads_#{sanitize_filename(@playlist.name)}")
+      folder_name = "spotify_downloads_#{sanitize_filename(@playlist.name)}"
+      download_dir = Rails.root.join('public', 'downloads', folder_name)
       FileUtils.mkdir_p(download_dir)
 
       ActionCable.server.broadcast "progress_channel", {
@@ -42,9 +42,12 @@ class PlaylistsController < ApplicationController
         download_track(track.name, track.artists.first.name, artwork_data, download_dir)
       end
 
+      zip_file_path = Rails.root.join('public', 'downloads', "#{folder_name}.zip").to_s
+      system('zip', '-r', zip_file_path, download_dir.to_s)
+
       ActionCable.server.broadcast "progress_channel", {
         type: "complete",
-        download_path: "/downloads/spotify_downloads_#{sanitize_filename(@playlist.name)}"
+        download_path: "/downloads/#{folder_name}.zip"
       }
 
     rescue => e
