@@ -1,3 +1,4 @@
+# app/controllers/playlists_controller.rb
 class PlaylistsController < ApplicationController
   require 'csv'
   require 'rspotify'
@@ -12,45 +13,48 @@ class PlaylistsController < ApplicationController
 
   def download
     @playlist_id = params[:playlist_id]
-
-    # Initialize Spotify API
     RSpotify.authenticate("e50546d4ba114f9ca823624fdfac627f", "929f6368e8d7478ebc5a7394f0653cb6")
 
     begin
       @playlist = RSpotify::Playlist.find_by_id(@playlist_id)
       raise "Playlist not found" unless @playlist
 
-      # Create downloads directory
       download_dir = Rails.root.join('public', 'downloads', "spotify_downloads_#{sanitize_filename(@playlist.name)}")
       FileUtils.mkdir_p(download_dir)
 
-      # Create CSV file
-      csv_path = download_dir.join("#{@playlist.name.gsub(' ', '_')}_tracks.csv")
-      @tracks_info = []
+      ActionCable.server.broadcast "progress_channel", {
+        type: "playlist_info",
+        name: @playlist.name,
+        total_tracks: @playlist.tracks.count
+      }
 
-      CSV.open(csv_path, 'w') do |csv|
-        csv << ['Track Name', 'Artist']
-        @playlist.tracks.each do |track|
-          artwork_url = track.album.images.max_by { |img| img['height'].to_i }&.fetch('url')
-          track_info = [track.name, track.artists.first.name, artwork_url]
-          @tracks_info << track_info
-          csv << track_info[0..1]
-        end
-      end
-
-      # Download tracks
-      @tracks_info.each do |track_name, artist_name, artwork_url|
+      @playlist.tracks.each_with_index do |track, index|
+        artwork_url = track.album.images.max_by { |img| img['height'].to_i }&.fetch('url')
         artwork_data = get_artwork_data(artwork_url)
-        download_track(track_name, artist_name, artwork_data, download_dir)
+
+        ActionCable.server.broadcast "progress_channel", {
+          type: "track_progress",
+          track_name: track.name,
+          artist_name: track.artists.first.name,
+          index: index + 1
+        }
+
+        download_track(track.name, track.artists.first.name, artwork_data, download_dir)
       end
 
-      @success = true
-      @download_path = "/downloads/spotify_downloads_#{sanitize_filename(@playlist.name)}"
+      ActionCable.server.broadcast "progress_channel", {
+        type: "complete",
+        download_path: "/downloads/spotify_downloads_#{sanitize_filename(@playlist.name)}"
+      }
+
     rescue => e
-      @error = e.message
+      ActionCable.server.broadcast "progress_channel", {
+        type: "error",
+        message: e.message
+      }
     end
 
-    render :new
+    head :ok
   end
 
   private
@@ -100,4 +104,4 @@ class PlaylistsController < ApplicationController
       logger.warn "Download failed for #{track_name}"
     end
   end
-end
+ end

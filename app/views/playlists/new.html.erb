@@ -1,39 +1,17 @@
+# app/views/playlists/new.html.erb
 <div style="max-width: 600px; margin: 40px auto; padding: 20px;">
-  <h1 style="margin-bottom: 20px;">Spotify Playlist Downloader</h1>
+ <h1 style="margin-bottom: 20px;">Spotify Playlist Downloader</h1>
 
-  <%= form_tag('/download', method: :post, style: 'margin-bottom: 20px;') do %>
-    <div style="margin-bottom: 15px;">
-      <%= label_tag :playlist_id, 'Enter Spotify Playlist ID:', style: 'display: block; margin-bottom: 5px;' %>
-      <%= text_field_tag :playlist_id, nil, style: 'width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;' %>
-    </div>
-    <%= submit_tag 'Download Playlist', style: 'background: #1DB954; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;' %>
-  <% end %>
+ <%= form_tag('/download', method: :post, style: 'margin-bottom: 20px;', remote: true) do %>
+   <div style="margin-bottom: 15px;">
+     <%= label_tag :playlist_id, 'Enter Spotify Playlist ID:', style: 'display: block; margin-bottom: 5px;' %>
+     <%= text_field_tag :playlist_id, nil, style: 'width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;' %>
+   </div>
+   <%= submit_tag 'Download Playlist', style: 'background: #1DB954; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;' %>
+ <% end %>
 
-  <% if @error %>
-    <div style="color: red; margin-top: 20px;">
-      Error: <%= @error %>
-    </div>
-  <% end %>
-
-  <% if @tracks_info&.any? %>
-    <div style="margin-top: 20px;">
-      <h2>Downloading Playlist: <%= @playlist.name %></h2>
-      <p>Total tracks: <%= @tracks_info.length %></p>
-
-      <ul style="list-style: none; padding: 0;">
-        <% @tracks_info.each_with_index do |(track_name, artist_name, _), index| %>
-          <li style="margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 4px;">
-            <%= "#{index + 1}. #{track_name} - #{artist_name}" %>
-          </li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <% if @success %>
-    <div style="margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 4px;">
-      <p>Download complete! Files are saved in the downloads directory.</p>
-      <p>You can access your files here: <%= link_to 'Download Files', @download_path, style: 'color: #1DB954;' %></p>
-    </div>
-  <% end %>
+ <div id="error-message"></div>
+ <div id="playlist-info"></div>
+ <ul id="tracks-list" style="list-style: none; padding: 0;"></ul>
+ <div id="download-complete"></div>
 </div>
