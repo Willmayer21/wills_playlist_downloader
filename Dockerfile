@@ -22,5 +22,16 @@ RUN bundle install
 # Copy app files
 COPY . .
 
+# Precompile assets
+ENV RAILS_ENV=production
+ENV RAILS_SERVE_STATIC_FILES=true
+RUN bundle exec rails assets:precompile
+
+# Create downloads directory with proper permissions
+RUN mkdir -p public/downloads && chmod 777 public/downloads
+
+# Expose port
+EXPOSE 3000
+
 # Start Rails server
-CMD ["rails", "server", "-b", "0.0.0.0"]
+CMD ["rails", "server", "-b", "0.0.0.0", "-p", "3000"]
