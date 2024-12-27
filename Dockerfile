@@ -2,10 +2,14 @@ FROM ruby:3.1.2
 
 # Install required packages
 RUN apt-get update && apt-get install -y \
-   yt-dlp \
-   zip \
-   nodejs \
-   npm
+    python3 \
+    python3-pip \
+    zip \
+    nodejs \
+    npm
+
+# Install yt-dlp via pip
+RUN pip3 install yt-dlp
 
 # Create app directory
 WORKDIR /app
