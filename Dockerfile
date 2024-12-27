@@ -1,4 +1,4 @@
-FROM ruby:3.1.2
+FROM ruby:3.3.5  # Changed from 3.1.2 to match your Gemfile
 
 # Install required packages
 RUN apt-get update && apt-get install -y \
