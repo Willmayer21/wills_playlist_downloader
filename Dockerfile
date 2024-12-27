@@ -25,6 +25,7 @@ COPY . .
 # Set Rails environment
 ENV RAILS_ENV=production
 ENV RAILS_SERVE_STATIC_FILES=true
+ENV SECRET_KEY_BASE=4dae70976fb93eff4b131b8f100f18fb42f2ae15d72cb505da2e87e31e62cbe594f8d6a3c072f97f0b79f95c57f0973b5c9e286c8d85afd828b98990f4b89639
 
 # Precompile assets
 RUN bundle exec rails assets:precompile
