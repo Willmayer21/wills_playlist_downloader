@@ -4,13 +4,12 @@ FROM ruby:3.1.2
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
-    pipx \
     zip \
     nodejs \
     npm
 
-# Install yt-dlp via pipx
-RUN pipx install yt-dlp
+# Install yt-dlp via pip with break-system-packages flag
+RUN pip3 install --break-system-packages yt-dlp
 
 # Create app directory
 WORKDIR /app
