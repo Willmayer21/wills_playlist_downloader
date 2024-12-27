@@ -22,9 +22,11 @@ RUN bundle install
 # Copy app files
 COPY . .
 
-# Precompile assets
+# Set Rails environment
 ENV RAILS_ENV=production
 ENV RAILS_SERVE_STATIC_FILES=true
+
+# Precompile assets
 RUN bundle exec rails assets:precompile
 
 # Create downloads directory with proper permissions
