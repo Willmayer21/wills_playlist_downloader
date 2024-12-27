@@ -1,15 +1,16 @@
-FROM ruby:3.3.5
+FROM ruby:3.1.2
 
 # Install required packages
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
+    pipx \
     zip \
     nodejs \
     npm
 
-# Install yt-dlp via pip
-RUN pip3 install yt-dlp
+# Install yt-dlp via pipx
+RUN pipx install yt-dlp
 
 # Create app directory
 WORKDIR /app
